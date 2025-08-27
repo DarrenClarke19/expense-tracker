@@ -6,7 +6,21 @@ FILE_PATH = "data/expenses.csv"
 
 def ensure_file_exists():
     """Make sure the CSV file exists with headers."""
+    needs_headers = False
+    
     if not os.path.exists(FILE_PATH):
+        needs_headers = True
+    else:
+        # Check if file is empty or missing headers
+        try:
+            with open(FILE_PATH, mode="r", newline="") as file:
+                first_line = file.readline().strip()
+                if not first_line or not first_line.startswith("id,"):
+                    needs_headers = True
+        except:
+            needs_headers = True
+    
+    if needs_headers:
         os.makedirs(os.path.dirname(FILE_PATH), exist_ok=True)
         with open(FILE_PATH, mode="w", newline="") as file:
             writer = csv.DictWriter(file, fieldnames=["id", "description", "amount", "date"])
